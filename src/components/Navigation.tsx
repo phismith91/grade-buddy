@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Calculator, BookOpen } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 const Navigation = () => {
   const location = useLocation();
@@ -36,6 +37,7 @@ const Navigation = () => {
             <BookOpen className="w-4 h-4" />
             <span className="hidden sm:inline">Doku</span>
           </Link>
+          <ThemeToggle />
         </div>
       </div>
     </nav>
