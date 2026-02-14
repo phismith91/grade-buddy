@@ -7,9 +7,9 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1rem",
       screens: {
-        "2xl": "1400px",
+        "2xl": "1200px",
       },
     },
     extend: {
@@ -47,16 +47,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        paper: "hsl(var(--paper))",
-        ink: {
-          DEFAULT: "hsl(var(--ink))",
-          light: "hsl(var(--ink-light))",
-        },
         grade: {
-          red: "hsl(var(--grade-red))",
-          green: "hsl(var(--grade-green))",
+          excellent: "hsl(var(--grade-excellent))",
+          good: "hsl(var(--grade-good))",
+          ok: "hsl(var(--grade-ok))",
+          warn: "hsl(var(--grade-warn))",
+          bad: "hsl(var(--grade-bad))",
+          fail: "hsl(var(--grade-fail))",
         },
-        stamp: "hsl(var(--stamp))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -70,8 +68,8 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
       },
       keyframes: {
         "accordion-down": {
@@ -82,21 +80,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "stamp-in": {
-          "0%": { transform: "scale(3) rotate(-15deg)", opacity: "0" },
-          "60%": { transform: "scale(0.9) rotate(-5deg)", opacity: "0.9" },
-          "100%": { transform: "scale(1) rotate(-5deg)", opacity: "0.8" },
-        },
-        "write-in": {
-          "0%": { opacity: "0", transform: "translateY(5px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "stamp-in": "stamp-in 0.4s ease-out forwards",
-        "write-in": "write-in 0.3s ease-out forwards",
       },
     },
   },

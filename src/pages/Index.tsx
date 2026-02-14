@@ -1,96 +1,78 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Calculator, FileText, BookOpen, ArrowRight } from "lucide-react";
+import { Calculator, FileText, BookOpen, Sparkles } from "lucide-react";
+import EinzelnotenCalc from "@/components/EinzelnotenCalc";
+import ZeugnisCalc from "@/components/ZeugnisCalc";
 
-const features = [
-  {
-    icon: Calculator,
-    title: "Einzelnotenrechner",
-    description: "Berechne deine Note aus Arbeiten, Tests und mündlichen Leistungen mit individueller Gewichtung.",
-    link: "/einzelnoten",
-  },
-  {
-    icon: FileText,
-    title: "Zeugnisrechner",
-    description: "Trage alle Fächer ein, markiere Haupt- und Nebenfächer und berechne deine Zeugnisnote.",
-    link: "/zeugnis",
-  },
-  {
-    icon: BookOpen,
-    title: "Dokumentation",
-    description: "Erfahre wie die App funktioniert und wie sie für verschiedene Bundesländer angepasst werden kann.",
-    link: "/dokumentation",
-  },
-];
+const tabs = [
+  { id: "einzel", label: "Einzelnoten", icon: Calculator, emoji: "🧮" },
+  { id: "zeugnis", label: "Zeugnis", icon: FileText, emoji: "📋" },
+] as const;
+
+type TabId = (typeof tabs)[number]["id"];
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState<TabId>("einzel");
+
   return (
-    <div className="min-h-[calc(100vh-60px)] flex flex-col items-center justify-center px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-3xl"
-      >
-        {/* Zeugnis-style header */}
-        <div className="paper-texture paper-border rounded p-8 sm:p-12 mb-8 text-center">
-          <div className="border-b-2 border-foreground/20 pb-6 mb-6">
-            <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2 tracking-tight">
-              Zeugnis & Notenrechner
-            </h1>
-            <p className="text-ink-light text-sm sm:text-base mt-3">
-              Bundesrepublik Deutschland
-            </p>
-          </div>
-          
-          <div className="space-y-2 text-ink-light">
-            <p className="text-base sm:text-lg">
-              Berechne deine Noten einfach und schnell – 
-              <span className="font-handwriting text-2xl text-grade-red ml-2">wie echt!</span>
-            </p>
-            <p className="text-sm">
-              Für Schüler aller Klassenstufen · Einfach zu bedienen
-            </p>
-          </div>
+    <div className="min-h-[calc(100vh-60px)] px-4 py-6">
+      <div className="container mx-auto max-w-2xl">
+        {/* Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-6"
+        >
+          <h1 className="text-3xl sm:text-4xl font-black text-foreground mb-1">
+            Noten<span className="gradient-hero bg-clip-text text-transparent">rechner</span> ✨
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Check deine Noten – easy & sofort.
+          </p>
+        </motion.div>
 
-          <div className="mt-8 flex justify-center">
-            <div className="stamp-effect animate-stamp-in font-bold text-sm tracking-wider uppercase">
-              Schuljahr 2025/26
-            </div>
-          </div>
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                activeTab === tab.id
+                  ? "gradient-hero text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]"
+                  : "bg-card text-muted-foreground hover:text-foreground border border-border"
+              }`}
+            >
+              <span className="text-lg">{tab.emoji}</span>
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Feature Cards */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 + index * 0.1 }}
-              >
-                <Link
-                  to={feature.link}
-                  className="paper-texture rounded p-6 block group hover:shadow-lg transition-shadow h-full"
-                >
-                  <Icon className="w-8 h-8 text-primary mb-3" />
-                  <h2 className="font-bold text-foreground mb-2 text-lg group-hover:text-primary transition-colors">
-                    {feature.title}
-                  </h2>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {feature.description}
-                  </p>
-                  <span className="text-primary text-sm font-sans-ui flex items-center gap-1 font-medium">
-                    Öffnen <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
+        {/* Content */}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="bg-card rounded-2xl border border-border p-5 sm:p-6 shadow-sm"
+        >
+          {activeTab === "einzel" ? <EinzelnotenCalc /> : <ZeugnisCalc />}
+        </motion.div>
+
+        {/* Footer hint */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center text-xs text-muted-foreground mt-6 flex items-center justify-center gap-1"
+        >
+          <BookOpen className="w-3 h-3" />
+          <a href="/dokumentation" className="hover:text-primary transition-colors underline underline-offset-2">
+            Wie funktioniert's?
+          </a>
+        </motion.p>
+      </div>
     </div>
   );
 };
