@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, X, Sparkles } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import GradeResult from "@/components/GradeResult";
+import { parseNote, isValidNote } from "@/lib/parseNote";
 
 interface Leistung {
   id: string;
@@ -39,15 +40,29 @@ const EinzelnotenCalc = () => {
     );
   };
 
-  // Live calculation
-  const valid = leistungen.filter(
-    (l) => l.note !== "" && !isNaN(Number(l.note)) && Number(l.note) >= 1 && Number(l.note) <= 6
-  );
-  const totalWeight = valid.reduce((s, l) => s + l.gewichtung, 0);
-  const ergebnis =
-    totalWeight > 0
-      ? valid.reduce((s, l) => s + Number(l.note) * l.gewichtung, 0) / totalWeight
-      : null;
+  // Live calculation – der Slider (anteil) beeinflusst die Gewichtung:
+  // Leistungen mit gewichtung >= 2 gelten als "schriftlich", Rest als "mündlich"
+  const valid = leistungen.filter((l) => isValidNote(l.note));
+
+  const schriftlich = valid.filter((l) => l.gewichtung >= 2);
+  const muendlich = valid.filter((l) => l.gewichtung < 2);
+
+  const avg = (arr: typeof valid) => {
+    const tw = arr.reduce((s, l) => s + l.gewichtung, 0);
+    return tw > 0 ? arr.reduce((s, l) => s + parseNote(l.note) * l.gewichtung, 0) / tw : null;
+  };
+
+  const schriftlichAvg = avg(schriftlich);
+  const muendlichAvg = avg(muendlich);
+
+  let ergebnis: number | null = null;
+  if (schriftlichAvg !== null && muendlichAvg !== null) {
+    ergebnis = (schriftlichAvg * anteil + muendlichAvg * (100 - anteil)) / 100;
+  } else if (schriftlichAvg !== null) {
+    ergebnis = schriftlichAvg;
+  } else if (muendlichAvg !== null) {
+    ergebnis = muendlichAvg;
+  }
 
   return (
     <div className="space-y-4">
@@ -102,9 +117,8 @@ const EinzelnotenCalc = () => {
               />
 
               <input
-                type="number"
-                min={1}
-                max={6}
+                type="text"
+                inputMode="decimal"
                 value={l.note}
                 onChange={(e) => update(l.id, "note", e.target.value)}
                 className="note-input"

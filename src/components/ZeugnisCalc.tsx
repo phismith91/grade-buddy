@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Star } from "lucide-react";
 import GradeResult from "@/components/GradeResult";
+import { parseNote, isValidNote } from "@/lib/parseNote";
 
 interface Fach {
   id: string;
@@ -44,23 +45,21 @@ const ZeugnisCalc = () => {
   };
 
   // Live calculation
-  const valid = faecher.filter(
-    (f) => f.note !== "" && !isNaN(Number(f.note)) && Number(f.note) >= 1 && Number(f.note) <= 6
-  );
+  const valid = faecher.filter((f) => isValidNote(f.note));
   const haupt = valid.filter((f) => f.hauptfach);
   const neben = valid.filter((f) => !f.hauptfach);
 
   const avg = (arr: Fach[]) =>
     arr.length > 0
-      ? arr.reduce((s, f) => s + Number(f.note), 0) / arr.length
+      ? arr.reduce((s, f) => s + parseNote(f.note), 0) / arr.length
       : null;
 
   const hauptSchnitt = avg(haupt);
   const nebenSchnitt = avg(neben);
 
   // Hauptfächer doppelt
-  const hauptSum = haupt.reduce((s, f) => s + Number(f.note) * 2, 0);
-  const nebenSum = neben.reduce((s, f) => s + Number(f.note), 0);
+  const hauptSum = haupt.reduce((s, f) => s + parseNote(f.note) * 2, 0);
+  const nebenSum = neben.reduce((s, f) => s + parseNote(f.note), 0);
   const totalWeight = haupt.length * 2 + neben.length;
   const gesamt = totalWeight > 0 ? (hauptSum + nebenSum) / totalWeight : null;
 
@@ -180,9 +179,8 @@ const FachList = ({ faecher, onUpdate, onRemove }: FachListProps) => (
           />
 
           <input
-            type="number"
-            min={1}
-            max={6}
+            type="text"
+            inputMode="decimal"
             value={f.note}
             onChange={(e) => onUpdate(f.id, "note", e.target.value)}
             className="note-input"
