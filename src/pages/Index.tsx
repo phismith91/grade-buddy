@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Calculator, FileText, BookOpen, Sparkles } from "lucide-react";
+import { Calculator, FileText, BookOpen, Target } from "lucide-react";
 import EinzelnotenCalc from "@/components/EinzelnotenCalc";
 import ZeugnisCalc from "@/components/ZeugnisCalc";
+import NotenSimulator from "@/components/NotenSimulator";
 
 const tabs = [
   { id: "einzel", label: "Einzelnoten", icon: Calculator, emoji: "🧮" },
   { id: "zeugnis", label: "Zeugnis", icon: FileText, emoji: "📋" },
+  { id: "simulator", label: "Simulator", icon: Target, emoji: "🎯" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -57,7 +59,7 @@ const Index = () => {
           transition={{ duration: 0.2 }}
           className="bg-card rounded-2xl border border-border p-5 sm:p-6 shadow-sm"
         >
-          {activeTab === "einzel" ? <EinzelnotenCalc /> : <ZeugnisCalc />}
+          {activeTab === "einzel" ? <EinzelnotenCalc /> : activeTab === "zeugnis" ? <ZeugnisCalc /> : <NotenSimulator />}
         </motion.div>
 
         {/* Footer hint */}
