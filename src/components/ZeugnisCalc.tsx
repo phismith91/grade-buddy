@@ -9,17 +9,18 @@ interface Fach {
   name: string;
   note: string;
   hauptfach: boolean;
+  gewichtung: number;
 }
 
 const INITIAL: Fach[] = [
-  { id: "1", name: "Deutsch", note: "2", hauptfach: true },
-  { id: "2", name: "Mathe", note: "3", hauptfach: true },
-  { id: "3", name: "Englisch", note: "2", hauptfach: true },
-  { id: "4", name: "Geschichte", note: "1", hauptfach: false },
-  { id: "5", name: "Bio", note: "2", hauptfach: false },
-  { id: "6", name: "Sport", note: "1", hauptfach: false },
-  { id: "7", name: "Kunst", note: "3", hauptfach: false },
-  { id: "8", name: "Musik", note: "2", hauptfach: false },
+  { id: "1", name: "Deutsch", note: "2", hauptfach: true, gewichtung: 2 },
+  { id: "2", name: "Mathe", note: "3", hauptfach: true, gewichtung: 2 },
+  { id: "3", name: "Englisch", note: "2", hauptfach: true, gewichtung: 2 },
+  { id: "4", name: "Geschichte", note: "1", hauptfach: false, gewichtung: 1 },
+  { id: "5", name: "Bio", note: "2", hauptfach: false, gewichtung: 1 },
+  { id: "6", name: "Sport", note: "1", hauptfach: false, gewichtung: 1 },
+  { id: "7", name: "Kunst", note: "3", hauptfach: false, gewichtung: 1 },
+  { id: "8", name: "Musik", note: "2", hauptfach: false, gewichtung: 1 },
 ];
 
 const ZeugnisCalc = () => {
@@ -30,7 +31,7 @@ const ZeugnisCalc = () => {
   const add = () => {
     setFaecher((p) => [
       ...p,
-      { id: `${Date.now()}`, name: "", note: "", hauptfach: false },
+      { id: `${Date.now()}`, name: "", note: "", hauptfach: false, gewichtung: 1 },
     ]);
   };
 
@@ -38,30 +39,32 @@ const ZeugnisCalc = () => {
     setFaecher((p) => p.filter((f) => f.id !== id));
   };
 
-  const update = (id: string, field: keyof Fach, value: string | boolean) => {
+  const update = (id: string, field: keyof Fach, value: string | boolean | number) => {
     setFaecher((p) =>
       p.map((f) => (f.id === id ? { ...f, [field]: value } : f))
     );
   };
 
-  // Live calculation
+  // Live calculation – jedes Fach hat seine eigene Gewichtung
   const valid = faecher.filter((f) => isValidNote(f.note));
   const haupt = valid.filter((f) => f.hauptfach);
   const neben = valid.filter((f) => !f.hauptfach);
 
-  const avg = (arr: Fach[]) =>
-    arr.length > 0
-      ? arr.reduce((s, f) => s + parseNote(f.note), 0) / arr.length
+  const weightedAvg = (arr: Fach[]) => {
+    const tw = arr.reduce((s, f) => s + f.gewichtung, 0);
+    return tw > 0
+      ? arr.reduce((s, f) => s + parseNote(f.note) * f.gewichtung, 0) / tw
       : null;
+  };
 
-  const hauptSchnitt = avg(haupt);
-  const nebenSchnitt = avg(neben);
+  const hauptSchnitt = weightedAvg(haupt);
+  const nebenSchnitt = weightedAvg(neben);
 
-  // Hauptfächer doppelt
-  const hauptSum = haupt.reduce((s, f) => s + parseNote(f.note) * 2, 0);
-  const nebenSum = neben.reduce((s, f) => s + parseNote(f.note), 0);
-  const totalWeight = haupt.length * 2 + neben.length;
-  const gesamt = totalWeight > 0 ? (hauptSum + nebenSum) / totalWeight : null;
+  // Gesamt: alle Fächer gewichtet
+  const totalWeight = valid.reduce((s, f) => s + f.gewichtung, 0);
+  const gesamt = totalWeight > 0
+    ? valid.reduce((s, f) => s + parseNote(f.note) * f.gewichtung, 0) / totalWeight
+    : null;
 
   const hauptFaecher = faecher.filter((f) => f.hauptfach);
   const nebenFaecher = faecher.filter((f) => !f.hauptfach);
@@ -91,7 +94,7 @@ const ZeugnisCalc = () => {
       </div>
 
       <p className="text-xs text-muted-foreground flex items-center gap-1">
-        <Star className="w-3 h-3 text-primary" fill="currentColor" /> = Hauptfach (zählt 2×)
+        <Star className="w-3 h-3 text-primary" fill="currentColor" /> = Hauptfach · Gewichtung pro Fach einstellbar (1×, 1½×, 2×, 3×)
       </p>
 
       {/* Hauptfächer */}
@@ -143,7 +146,7 @@ const ZeugnisCalc = () => {
 
 interface FachListProps {
   faecher: Fach[];
-  onUpdate: (id: string, field: keyof Fach, value: string | boolean) => void;
+  onUpdate: (id: string, field: keyof Fach, value: string | boolean | number) => void;
   onRemove: (id: string) => void;
 }
 
@@ -186,6 +189,18 @@ const FachList = ({ faecher, onUpdate, onRemove }: FachListProps) => (
             className="note-input"
             placeholder="?"
           />
+
+          <select
+            value={f.gewichtung}
+            onChange={(e) => onUpdate(f.id, "gewichtung", Number(e.target.value))}
+            className="bg-muted text-foreground rounded-lg px-2 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value={0.5}>½×</option>
+            <option value={1}>1×</option>
+            <option value={1.5}>1½×</option>
+            <option value={2}>2×</option>
+            <option value={3}>3×</option>
+          </select>
 
           <button
             onClick={() => onRemove(f.id)}
