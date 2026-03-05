@@ -120,6 +120,13 @@
     background: var(--gradient-hero);
   }
 
+  .gradient-text {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
   .gradient-teal {
     background: var(--gradient-teal);
   }
