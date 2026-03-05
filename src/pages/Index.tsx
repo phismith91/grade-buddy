@@ -26,7 +26,7 @@ const Index = () => {
           className="text-center mb-6"
         >
           <h1 className="text-3xl sm:text-4xl font-black text-foreground mb-1">
-            Noten<span className="gradient-hero bg-clip-text text-transparent">rechner</span> ✨
+            Noten<span className="gradient-text">rechner</span> ✨
           </h1>
           <p className="text-muted-foreground text-sm">
             Check deine Noten – easy & sofort.
